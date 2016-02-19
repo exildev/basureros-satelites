@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="elements/webcomponentsjs/webcomponents-lite.js"></script>
+	<link rel="import" href="map-control.html">
+	<style>
+        hrml, body{
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+<body>
+</body>
+	<map-control></map-control>
+	<script>
+        mapControl.config = {
+            lati: 10.4001423,
+            long: -75.507815,
+
+            zoom: 13,
+            mapType: 'roadmap', // 'roadmap' 'satellite' 'hybrid' 'terrain'
+            services: {
+                luminarias: 'http://192.168.1.70:9000/luminarias.json', //luminarias.json/?busqueda="string"
+								zona: 'http://192.168.1.70:9000/luminaria/filtro/zona/',
+								direccion: 'http://192.168.1.70:9000/luminaria/filtro/zona/direccion/',
+								cuadrilla: 'http://192.168.1.70:9000/luminaria/filtro/zona/cuadrilla/'
+            }
+        }
+        document.addEventListener('mc-addmarker', function(e){
+            console.log(e);
+        });
+        document.addEventListener('mc-clickmarker', function(e){
+            console.log(e);
+        });
+    </script>
+</html>

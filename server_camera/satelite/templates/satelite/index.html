@@ -1,0 +1,93 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+
+        <title>Map Control</title>
+        <meta name="description" content="">
+
+        <!-- Mobile -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Chrome / Android -->
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="theme-color" content="black">
+        <link rel="icon" href="icon.png">
+
+        <!-- Safari / iOS -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black">
+        <link rel="apple-touch-icon-precomposed" href="apple-touch-icon.png">
+
+        <!-- Web Components -->
+
+        <link rel="stylesheet" type="text/css" href="/static/suit/bootstrap/css/bootstrap.min.css" media="all"/>
+        <link rel="stylesheet" type="text/css" href="/static/suit/css/suit.css" media="all">
+        <script type="text/javascript">window.__admin_media_prefix__ = "/static/admin/";</script>
+        <script src="/static/suit/js/jquery-1.8.3.min.js"></script>
+        <script type="text/javascript">var Suit = { $: $.noConflict() }; if (!$) $ = Suit.$; </script>
+        <script src="/static/suit/bootstrap/js/bootstrap.min.js"></script>
+        <script src="{% static 'inventario/js/jquery.form.min.js' %}"></script>
+        <script src="{% static 'inventario/js/notificacion.js' %}"></script>
+        <script>
+            if ('registerElement' in document && 'createShadowRoot' in HTMLElement.prototype && 'import' in document.createElement('link') && 'content' in document.createElement('template')) {
+                // Native WC support. Do nothing
+            } else {
+                document.write('<script src="{% static 'bower_components/webcomponentsjs/webcomponents.js' %}"><\/script>');
+            }
+        </script>
+        <link rel="import" href="{% static 'elementos/bas-map.html' %}">
+        <link rel="import" href="{% static 'bower_components/font-roboto/roboto.html'%}">
+        <link rel="import" href="{% static 'bower_components/core-menu/core-menu.html'%}">
+        <link rel="import" href="{% static 'bower_components/core-item/core-item.html'%}">
+        <link rel="stylesheet" href="{% static 'satelite/css/style.css' %}">
+        <script type="text/javascript" src="{% static 'satelite/js/script.js' %}"></script>
+    </head>
+
+    <body unresolved onload="setup()">
+        <style>
+            core-menu{
+                margin: 3px;
+            }
+            div[drawer]{
+                height: calc(100% - 64px) !important;
+            }
+        </style>
+        <core-ajax id="ajax" url="/ws/imagenes/" method="get" handleAs="json"></core-ajax>
+        <core-drawer-panel id="dp">
+          	<div drawer>
+            	<core-toolbar>
+        			<input type="search" value="{{q}}" playsholder="Buscar apoyo..." onchange="buscar(this.value)"/>
+        			<core-icon-button icon="search"></core-icon-button>
+        		</core-toolbar>
+        		<core-menu id="listlum" valueattr="rel">
+        
+        		</core-menu>
+          	</div>
+          	<div main>
+          		<core-drawer-panel rightDrawer id="right">
+          			<div drawer>
+          				<core-toolbar>
+        					<core-icon-button icon="menu" on-tap="{{toggleRight}}"></core-icon-button>
+        				</core-toolbar>
+        				<div id="imagenes"></div>
+          			</div>
+          			<div main>
+          		 		<bas-map 
+          		 		    id="map" 
+          			 		{%if q%}url="/luminarias.json?busqueda={{q}}"{% endif %} 
+          			 		lat="10.3998334" 
+          			 		lon="-75.5066745" 
+          			 		zoom="7"
+          			 	></bas-map>
+          			</div>
+        		</core-drawer-panel>
+        	</div>
+        </core-drawer-panel>
+        <core-toolbar class="footer">
+            <img src="/static/icono.png" style="width: 55px;cursor: pointer;" onclick="location.href='/dashboard/luminaria/luminaria/'">
+        </core-toolbar>	
+    </body>
+    
+    </html>

@@ -1,0 +1,40 @@
+{% extends "dashboard/base.html" %}
+{% block head %}
+	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD1tjEA-nc_qr9ta0sqmqVtQSJLkNxj8T0&sensor=SET_TO_TRUE_OR_FALSE"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript">
+        $("document").ready(function(){
+            var mapOptions = {
+              zoom: 13,
+              center: new google.maps.LatLng(10.3998334,-75.5066745)
+            }
+            map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+            $.ajax({
+                url:'{% url 'json_basureros' %}',
+                success:function(data){
+                    for(var key in data){
+                        var gps = data[key];
+                        var marker = new google.maps.Marker({
+                            position: new google.maps.LatLng(gps.gps__latitude,gps.gps__longitude),
+                            map: map,
+                            title: 'Hola mundo'
+                        });
+                        google.maps.event.addListener(marker, 'click', function() {
+                            alert("di click " + gps.pk);
+                        });
+                    }
+                }
+            });
+        });
+    </script>
+    <style type="text/css">
+    	#map-canvas{
+    		height: calc(100vh - 96px);
+    	}
+    </style>
+{% endblock head %}
+{% block content %}
+	<div class="mdl-grid">
+		<div id="map-canvas" class="mdl-cell mdl-cell--12-col"></div>
+	</div>
+{% endblock content %}
