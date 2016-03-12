@@ -1,8 +1,17 @@
 from django.forms import ModelForm
-from models import Imagen
+import models 
+
 
 class ImagenForm(ModelForm):
 	class Meta:
-		model = Imagen
+		model = models.Imagen
+		exclude = []
+	#end class
+#end class
+
+class BasureroForm(ModelForm):
+	class Meta:
+		model = models.Basurero
+		fields = ['nombre', 'descripcion', 'tamano']
 	#end class
 #end class

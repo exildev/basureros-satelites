@@ -1,7 +1,7 @@
 ﻿create or replace function basureros_cercanos(lat numeric, lon numeric) returns setof satelite_basurero as 
 $$
 begin
-	return query(select b.id, nombre, descripcion, gps_id, fecha
+	return query(select b.id, nombre, descripcion, gps_id, fecha, tamano
 			from satelite_basurero as b 
 			join satelite_gps as gps 
 				on (gps.id = b.gps_id and distancia(gps.latitude::numeric, gps.longitude::numeric, lat, lon) <= 0.00487217386)

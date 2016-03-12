@@ -68,6 +68,14 @@
                 margin-top: calc(25% - 50px);
                 margin-left: calc(50% - 50px);
             }
+            
+            :host paper-drawer-panel paper-button{
+                background: var(--accent-color);
+                color:white;
+                margin: 3.5px 3px;
+                width: calc(100% - 6px);
+            }
+
 
             #filters paper-dropdown-menu{
                 width: 150px;
@@ -87,13 +95,10 @@
                 <paper-header-panel drawer>
                     <paper-toolbar>
                     </paper-toolbar>
-                    <paper-toolbar style="background-color: #fff">
-                        <paper-input id="search" label="search" type="search" value="{{filterVal::input}}"></paper-input>
-                        <paper-fab icon="search" mini on-tab="openSubMenu"></paper-fab>
-                    </paper-toolbar>
+                    
                     <div id="main-drawer">
                         <paper-menu id="pmenu" on-iron-select="_goMarker">
-                            <template is="dom-repeat" items="{{markers}}" filter="{{_filter(filterVal)}}" >
+                            <template is="dom-repeat" items="{{markers}}">
                                 <paper-item id="markerMenu">
                                     <input type="hidden" value="[[item.mp_index]]">
                                     <paper-item-body two-line>
@@ -128,7 +133,7 @@
                                 <h4><span>Reporte</span></h4>
                                 <p></p>
                                 <paper-button raised on-tap="_descartar">Descartar reporte</paper-button>
-                                <paper-button raised on-tab="_crearb">Crear basurero</paper-button>
+                                <paper-button raised on-tap="_crearb">Crear basurero</paper-button>
                                 <template is="dom-repeat" items="{{descrip.results}}" as="image">
                                   <iron-image on-tap="_openDg" style="margin: 0 auto; width:240px; height:240px; background-color: white;" sizing="contain" src="{{image.imagen}}" preload fade>
                                     <input class="data-dg" type="hidden" value="[[index]]" />
@@ -150,12 +155,34 @@
                 </div>
             </paper-dialog>
             <paper-dialog id="crearb">
-                <iron-form action="#!">
-                    <pape-input placeholder="Nombre"></paper-input>
-                    <pape-input placeholder="Tamaño"></paper-input>
-                </iron-form>
+                <div class="title">Nuevo basurero</div>
+                <div class="layout horizontal" >
+                    <form is="iron-form" action="{{config.services.crear}}" id="fcrearb" class="flex" on-iron-form-response="_rcrearb" method="post">
+                        <input type="hidden" name="reporte" id="reporte_id"/>
+                        <paper-input label="Nombre" name="nombre" type="text"></paper-input>
+                        <paper-textarea label="Descripcion" name="descripcion"></paper-textarea>
+                        <paper-input label="Tamaño" name="tamano" type="number"></paper-input>
+                    </form>    
+                </div>
                 <div class="buttons">
-                    <paper-button dialog-confirm>Enviar</paper-button>
+                    <paper-button dialog-dismiss>Cancel</paper-button>
+                    <paper-button dialog-confirm on-tap="_sendForm">Enviar</paper-button>
+                </div>
+            </paper-dialog>
+            <paper-dialog id="indexar">
+                <div class="title">Editar basurero</div>
+                <div class="layout horizontal" >
+                    <form is="iron-form" action="{{config.services.indexar}}" id="indexarb" class="flex" on-iron-form-response="indexado" method="post">
+                        <input type="hidden" name="reporte" id="reporte_id_index"/>
+                        <input type="hidden" name="basurero" id="basurero_id"/>
+                        <paper-input label="Nombre" name="nombre" type="text" id="btitle"></paper-input>
+                        <paper-textarea label="Descripcion" name="descripcion" id="bdesc"></paper-textarea>
+                        <paper-input label="Tamaño" name="tamano" type="number" id="btam"></paper-input>
+                    </form>    
+                </div>
+                <div class="buttons">
+                    <paper-button dialog-dismiss>Cancel</paper-button>
+                    <paper-button dialog-confirm on-tap="_sendIndex">Enviar</paper-button>
                 </div>
             </paper-dialog>
             <template is="dom-repeat" items="{{descrip.results}}" as="image">

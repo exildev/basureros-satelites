@@ -44,9 +44,6 @@ Polymer({
         this.map.panTo(marker.position);
         this._setZoom(18);
     },
-    _crearb:function(){
-        this.$.crearb.open();
-    },
     _init: function () {
         window.mapControl = this;
         this.addEventListener('google-map-ready', function (e) {
@@ -91,7 +88,7 @@ Polymer({
         });
     },
 
-    _addBasurero: function (nlat, nlng, title, icon, index, descripcion,id) {
+    _addBasurero: function (nlat, nlng, title, icon, index, descripcion, tamano,id) {
         var marker = new gm.Marker({
             map: this.map,
             title: title,
@@ -110,7 +107,8 @@ Polymer({
         var contentString = 
               '<h4 id="firstHeading" class="firstHeading">'+title+'</h1>'+
               '<p>' + descripcion + '<p><br>'+
-              '<paper-button raised on-tap="_goDash">Indexar reporte</paper-button>';
+              '<paper-button raised on-tap="_indexar" onclick="mapControl._indexar('+id+', \''+title+'\', \''+descripcion+'\', \''+tamano+'\')">Indexar reporte</paper-button>';
+
 
         var infowindow = new google.maps.InfoWindow({
             content: contentString
@@ -122,6 +120,8 @@ Polymer({
     },
 
     _submenuclose: function(e){
+        this.$.reporte_id.value = ""
+        this.$.crearb.close();
         for (var i = 0; i < this.markers.length; i++) {
             this.markers[i].marker.setMap(this.map);
         }
@@ -143,6 +143,38 @@ Polymer({
         console.log(this.selectedMarker)
         this.$.jsdescartar.params.id = this.selectedMarker.id;
         this.$.jsdescartar.generateRequest();
+    },
+
+    _indexar: function(id, titulo, descripcion, tamano){
+        console.log(id, titulo, descripcion, tamano);
+        this.$.btitle.value = titulo;
+        this.$.bdesc.value = descripcion
+        this.$.btam.value = tamano
+        this.$.reporte_id_index.value = this.selectedMarker.id
+        this.$.basurero_id.value = id;
+        this.$.indexar.open()
+    },
+
+    indexado: function(){
+       this._toasAlert('reporte indexado'); 
+       elem = document.querySelector('paper-item input[value="'+ this.selectedMarker.mp_index +'"]').parentNode
+       elem.parentNode.removeChild(elem)
+       this.markers[this.selectedMarker.mp_index].marker.setMap(null);
+       inputs = document.querySelectorAll('paper-item input[type="hidden"]')
+       for (var i = inputs.length - 1; i >= 0; i--) {
+           var input = inputs[i]
+           if (input.getAttribute("value") > this.selectedMarker.mp_index) {
+                console.log(input.getAttribute("value"))
+                input.setAttribute("value", (input.getAttribute("value") - 1));
+           };
+       };
+       this.markers.splice(this.selectedMarker.mp_index, 1);
+       this.closeSubMenu();
+       this._centerInMarkers(); 
+    },
+
+    _sendIndex: function(){
+        this.$.indexarb.submit();
     },
 
     _descartado: function(){
@@ -238,6 +270,7 @@ Polymer({
                 undefined,
                 i,
                 basurero.descripcion,
+                basurero.tamano,
                 basurero.pk
             );
         };
@@ -264,26 +297,31 @@ Polymer({
         this.map.fitBounds(bounds);
     },
     
-    _filter: function (val) {
-        return function (item) {
-            var res = null;
-            if (!val) res = true;
-            if (!item) res = false;
-            var marker = item.marker;
-            if (res === null)
-                res = marker.title.match(new RegExp(val, 'i'));
-            if (res) {
-                if (!marker.getVisible()) {
-                    marker.setVisible(true);
-                }
-            } else {
-                marker.setVisible(false);
-            }
-            return res;
-            //return item.name.;
-        };
+    _crearb: function(){
+        this.$.reporte_id.value = this.selectedMarker.id
+        this.$.crearb.open();
     },
 
+    _sendForm: function(){
+        this.$.fcrearb.submit();
+    },
+    _rcrearb: function(event){
+       this._toasAlert('reporte indexado'); 
+       elem = document.querySelector('paper-item input[value="'+ this.selectedMarker.mp_index +'"]').parentNode
+       elem.parentNode.removeChild(elem)
+       this.markers[this.selectedMarker.mp_index].marker.setMap(null);
+       inputs = document.querySelectorAll('paper-item input[type="hidden"]')
+       for (var i = inputs.length - 1; i >= 0; i--) {
+           var input = inputs[i]
+           if (input.getAttribute("value") > this.selectedMarker.mp_index) {
+                console.log(input.getAttribute("value"))
+                input.setAttribute("value", (input.getAttribute("value") - 1));
+           };
+       };
+       this.markers.splice(this.selectedMarker.mp_index, 1);
+       this.closeSubMenu();
+       this._centerInMarkers();
+    },
     _toasAlert: function(val) {
         this.$.talertm.innerHTML = val;
         this.$.talert.open();

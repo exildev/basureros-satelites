@@ -2,9 +2,9 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, Http404
 from django.core.files import File
 from models import Imagen, Basurero, GPS, Reporte
+from forms import BasureroForm
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
-from random import choice
 import string
 import os
 import json
@@ -13,7 +13,6 @@ import json
 def reportar_basurero(request):
 	latitude = request.POST.get('latitude',False)
 	longitude = request.POST.get('longitude',False)
-	#print latitude
 	if(latitude and longitude):
 		gps = GPS(latitude=latitude, longitude=longitude)
 		gps.save()
@@ -46,42 +45,36 @@ def descartar_reporte(request):
 #end def
 
 @csrf_exempt
-def aprobar_reporte(request):
+def crear_basurero(request):
+	reporte = request.POST.get('reporte', False)
+	reporte = get_object_or_404(Reporte, pk = reporte)
+	f = BasureroForm(request.POST)
+	if f.is_valid():
+		basurero = f.save(commit=False)
+		basurero.gps = reporte.gps
+		basurero.save()
+		reporte.basurero = basurero
+		reporte.save()
+		return HttpResponse(status=200)
+	#end if
+	return HttpResponse(status=400)
+#end def
+
+@csrf_exempt
+def indexar_reporte(request):
+	reporte = request.POST.get('reporte', False)
 	basurero = request.POST.get('basurero', False)
-	nombre = request.POST.get('nombre', False)
-	descripcion = request.POST.get('descripcion', False)
-	reporte = request.POST.get('id', False)
-
-	if reporte != '':
-		reporte = Reporte.objects.filter(pk = reporte).first()
+	reporte = get_object_or_404(Reporte, pk = reporte)
+	basurero = get_object_or_404(Basurero, pk= basurero)
+	f = BasureroForm(request.POST, instance=basurero)
+	if f.is_valid():
+		basurero = f.save(commit=False)
+		basurero.save()
+		reporte.basurero = basurero
+		reporte.save()
+		return HttpResponse(status=200)
 	#end if
-	if basurero != '':
-		basurero = Basurero.objects.filter(pk = basurero).first()
-	#end if
-
-	if reporte or reporte != '':
-		if basurero or basurero != '':
-			reporte.basurero = basurero
-			reporte.save()
-			if nombre:
-				reporte.nombre = nombre
-			#end if
-			if descripcion:
-				reporte.descripcion = descripcion
-			#end if
-			basurero.save()
-			return HttpResponse(status=200)
-		else:
-			if nombre and descripcion:
-				basurero = Basurero(gps = reporte.gps, nombre = nombre, descripcion = descripcion)
-				basurero.save()
-				reporte.basurero = basurero
-				reporte.save()
-				return HttpResponse(status = 200)
-			#end if
-		#end if
-	#end if
-	return HttpResponse(status = 400)
+	return HttpResponse(status=400)
 #end def
 
 def json_basureros(request):
@@ -94,7 +87,8 @@ def json_basureros(request):
 			'longitude':basurero.gps.longitude,
 			'pk': basurero.pk,
 			'nombre': basurero.nombre,
-			'descripcion': basurero.descripcion
+			'descripcion': basurero.descripcion,
+			'tamano': basurero.tamano
 		} for basurero in basureros]
 		return HttpResponse(json.dumps(basureros_list), content_type="application/json")
 	#end if

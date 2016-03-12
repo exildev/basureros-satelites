@@ -40,10 +40,11 @@ class GPSViewSet(viewsets.ModelViewSet):
 class BasureroSerializer(serializers.HyperlinkedModelSerializer):
 
 	gps = GPSSerializer()
+	imagenes = ImagenSerializer(many=True)
 
 	class Meta:
 		model = satelite.Basurero
-		fields = ['nombre', 'descripcion', 'gps', 'fecha', 'id']
+		fields = ['nombre', 'descripcion', 'gps', 'fecha', 'id', 'tamano', 'imagenes']
 	#end class
 #end class
 

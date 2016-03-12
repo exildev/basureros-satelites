@@ -44,6 +44,7 @@ class Basurero(models.Model):
 	descripcion = models.TextField()
 	gps = models.OneToOneField('GPS')
 	fecha = models.DateTimeField(auto_now_add=True)
+	tamano = models.FloatField()
 	class Meta:
 		verbose_name = "Basurero"
 		verbose_name_plural = "Basureros"
@@ -51,5 +52,9 @@ class Basurero(models.Model):
 
 	def __unicode__(self):
 		return unicode(self.nombre)
+	#end def
+
+	def imagenes(self):
+		return Imagen.objects.filter(reporte__basurero__id=self.id)
 	#end def
 #end class
