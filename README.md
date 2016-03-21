@@ -2,4 +2,4 @@
 
 to see this demo click [here][demo]
 
-[demo]: https://exildev.github.io/basureros-satelites/
+[demo]: http://104.236.33.228:8080/basureros/mostrar/
