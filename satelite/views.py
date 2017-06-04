@@ -105,6 +105,6 @@ def handle_uploaded_file(pk, f):
 		for chunk in f.chunks():
 			destination.write(chunk)
 		#end for
-		return '/tmp/'+filename, filenawithme
+		return '/tmp/'+filename, filename
 	#end 
 #end def

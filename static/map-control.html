@@ -1,0 +1,200 @@
+<link rel="import" href="elements/lib/lib.v.html">
+<dom-module id="map-control">
+    <template>
+        <style>
+            #submenu [drawer] {
+                overflow: auto;
+            }
+            
+            :host {
+                display: block;
+                font-family: 'Roboto', sans-serif;
+            }
+
+            :host #sheet {
+                width: 100%;
+                height: 100%;
+            }
+
+            :host #sheet paper-drawer-panel [drawer] {
+                background-color: var(--drawer-color2, #B2DFDB);
+            }
+
+            :host #main-content > paper-drawer-panel [drawer] {
+                background-color: var(--drawer-color1, white);
+            }
+
+            :host #main-content > paper-drawer-panel [main] {
+                /*background-color: var(--main-bg-color, grey);*/
+            }
+
+            /*:host #main-content > paper-drawer-panel {
+              top: 64px;
+              height: calc(100%;
+            }*/
+
+            :host #main-drawer-content {
+                height: 100%;
+                overflow-y: auto;
+            }
+
+            :host paper-menu {
+                background-color: transparent;
+            }
+
+            :host paper-toolbar .toolbar-tools {
+                padding: 0 5px;
+            }
+
+            :host paper-dropdown-menu {
+                width: 100%;
+            }
+
+            :host paper-dropdown-menu paper-menu-button {
+                width: 100%;
+                padding: 0;
+            }
+
+            :host google-map{
+                opacity: 0;
+                transition: opacity 1s;
+            }
+
+            :host paper-spinner{
+                width: 100px;
+                height: 100px;
+                z-index: -1;
+                position: absolute;
+                margin-top: calc(25% - 50px);
+                margin-left: calc(50% - 50px);
+            }
+            
+            :host paper-drawer-panel paper-button{
+                background: var(--accent-color);
+                color:white;
+                margin: 3.5px 3px;
+                width: calc(100% - 6px);
+            }
+
+
+            #filters paper-dropdown-menu{
+                width: 150px;
+                margin-left: 7px;
+            }
+
+            #descrip h4{
+              margin: 0 auto;
+            }
+        </style>
+        <iron-ajax id="jsLuminaria" handle-as="json" url="[[config.services.luminarias]]" on-response="_jsLuminarias" on-error="_error"></iron-ajax>
+        <iron-ajax id="jscercanos" handle-as="json" url="{{config.services.cercanos}}" on-response="_cercanos" on-error="_error"></iron-ajax>
+        <iron-ajax id="jsimagen"  handle-as="json" url="{{config.services.ws_imagen}}" on-response="_jsImagen" on-error="_error" ></iron-ajax>
+        <iron-ajax id="jsdescartar"  handle-as="json" url="{{config.services.descartar}}" on-response="_descartado" on-error="_error" ></iron-ajax>
+        <div id="sheet">
+            <paper-drawer-panel responsive-width="1024px">
+                <paper-header-panel drawer>
+                    <paper-toolbar>
+                    </paper-toolbar>
+                    
+                    <div id="main-drawer">
+                        <paper-menu id="pmenu" on-iron-select="_goMarker">
+                            <template is="dom-repeat" items="{{markers}}">
+                                <paper-item id="markerMenu">
+                                    <input type="hidden" value="[[item.mp_index]]">
+                                    <paper-item-body two-line>
+                                        <div>[[item.marker.title]]</div>
+                                        <div secondary>
+                                            <span>[[item.position.lat]]</span>,
+                                            <span>[[item.position.lng]]</span>
+                                        </div>
+                                    </paper-item-body>
+                                </paper-item>
+                            </template>
+                        </paper-menu>
+                    </div>
+                </paper-header-panel>
+                <paper-header-panel main>
+                    <paper-toolbar>
+                        <paper-icon-button icon="menu" paper-drawer-toggle></paper-icon-button>
+                        <div class="title" on-tap="_goHome">Basureros Satelites</div>
+                        <paper-menu-button horizontal-align="right" horizontal-offset="50">
+                          <paper-icon-button icon="more-vert" class="dropdown-trigger"></paper-icon-button>
+                          <paper-menu class="dropdown-content">
+                            <paper-item>Dashboard</paper-item>
+                            <paper-item>Settings</paper-item>
+                            <paper-item>Help</paper-item>
+                          </paper-menu>
+                        </paper-menu-button>
+                    </paper-toolbar>
+                    <div id="main-content">
+                        <paper-drawer-panel id="submenu" force-narrow disable-swipe disable-edge-swipe>
+                            <div id="descrip" drawer>
+                                <span class="nav_close">X</span>
+                                <h4><span>Reporte</span></h4>
+                                <p></p>
+                                <paper-button raised on-tap="_descartar">Descartar reporte</paper-button>
+                                <paper-button raised on-tap="_crearb">Crear basurero</paper-button>
+                                <template is="dom-repeat" items="{{descrip.results}}" as="image">
+                                  <iron-image on-tap="_openDg" style="margin: 0 auto; width:240px; height:240px; background-color: white;" sizing="contain" src="{{image.imagen}}" preload fade>
+                                    <input class="data-dg" type="hidden" value="[[index]]" />
+                                  </iron-image>
+                                </template>
+                            </div>
+                            <div main > <!-- class="layout horizontal center-center" -->
+                                <paper-spinner class active></paper-spinner>
+                                <google-map id="gMap" latitude="[[config.lati]]" longitude="[[config.long]]" zoom="[[config.zoom]]"></google-map>
+                            </div>
+                        </paper-drawer-panel>
+                    </div>
+                </paper-header-panel>
+            </paper-drawer-panel>
+            <paper-dialog id="talert">
+                <div id="talertm"></div>
+                <div class="buttons">
+                    <paper-button dialog-confirm>Aceptar</paper-button>
+                </div>
+            </paper-dialog>
+            <paper-dialog id="crearb">
+                <div class="title">Nuevo basurero</div>
+                <div class="layout horizontal" >
+                    <form is="iron-form" action="{{config.services.crear}}" id="fcrearb" class="flex" on-iron-form-response="_rcrearb" method="post">
+                        <input type="hidden" name="reporte" id="reporte_id"/>
+                        <paper-input label="Nombre" name="nombre" type="text"></paper-input>
+                        <paper-textarea label="Descripcion" name="descripcion"></paper-textarea>
+                        <paper-input label="Tamaño" name="tamano" type="number"></paper-input>
+                    </form>    
+                </div>
+                <div class="buttons">
+                    <paper-button dialog-dismiss>Cancel</paper-button>
+                    <paper-button dialog-confirm on-tap="_sendForm">Enviar</paper-button>
+                </div>
+            </paper-dialog>
+            <paper-dialog id="indexar">
+                <div class="title">Editar basurero</div>
+                <div class="layout horizontal" >
+                    <form is="iron-form" action="{{config.services.indexar}}" id="indexarb" class="flex" on-iron-form-response="indexado" method="post">
+                        <input type="hidden" name="reporte" id="reporte_id_index"/>
+                        <input type="hidden" name="basurero" id="basurero_id"/>
+                        <paper-input label="Nombre" name="nombre" type="text" id="btitle"></paper-input>
+                        <paper-textarea label="Descripcion" name="descripcion" id="bdesc"></paper-textarea>
+                        <paper-input label="Tamaño" name="tamano" type="number" id="btam"></paper-input>
+                    </form>    
+                </div>
+                <div class="buttons">
+                    <paper-button dialog-dismiss>Cancel</paper-button>
+                    <paper-button dialog-confirm on-tap="_sendIndex">Enviar</paper-button>
+                </div>
+            </paper-dialog>
+            <template is="dom-repeat" items="{{descrip.results}}" as="image">
+                <paper-dialog id="dg[[index]]" entry-animation="scale-up-animation" exit-animation="fade-out-animation">
+                    <div class="layout horizontal">
+                        <div class="flex"></div>
+                        <paper-icon-button icon="close" dialog-dismiss></paper-icon-button>
+                    </div>
+                    <iron-image style="min-width: 500px; min-height: 400px; max-width: 600px; max-height: 600px; background-color: white;" src="{{image.imagen}}" sizing="contain" preload fade></iron-image>
+                </paper-dialog>
+            </template>
+        </div>
+    </template>
+    <script src="map-control.js"></script>
+</dom-module>

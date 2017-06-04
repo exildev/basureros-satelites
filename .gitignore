@@ -6,3 +6,4 @@ media/**/*.png
 *.sqlite3
 log
 *.backup
+b_sat/*
