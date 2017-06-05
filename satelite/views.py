@@ -104,6 +104,11 @@ def mostrar_basureros(request):
 	return render(request,"index.html")
 #end def
 
+@login_required
+def home(request):
+	return render(request,"home.html")
+#end def
+
 def handle_uploaded_file(pk, f):
 	filename = str(pk) + "_" + f.name
 	with open('/tmp/'+filename, 'wb+') as destination:

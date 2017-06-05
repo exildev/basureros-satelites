@@ -1,0 +1,83 @@
+<html>
+<head>
+	<title>Basureros satelites</title>
+	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD1tjEA-nc_qr9ta0sqmqVtQSJLkNxj8T0&sensor=SET_TO_TRUE_OR_FALSE"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script type="text/javascript">
+		$("document").ready(function(){
+			var contentString = '<div id="content">'+
+            '<div id="siteNotice">'+
+            '</div>'+
+            '<h1 id="firstHeading" class="firstHeading">Uluru</h1>'+
+            '<div id="bodyContent">'+
+            '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
+            'sandstone rock formation in the southern part of the '+
+            'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) '+
+            'south west of the nearest large town, Alice Springs; 450&#160;km '+
+            '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major '+
+            'features of the Uluru - Kata Tjuta National Park. Uluru is '+
+            'sacred to the Pitjantjatjara and Yankunytjatjara, the '+
+            'Aboriginal people of the area. It has many springs, waterholes, '+
+            'rock caves and ancient paintings. Uluru is listed as a World '+
+            'Heritage Site.</p>'+
+            '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">'+
+            'https://en.wikipedia.org/w/index.php?title=Uluru</a> '+
+            '(last visited June 22, 2009).</p>'+
+            '</div>'+
+            '</div>';
+			bounds = new google.maps.LatLngBounds();
+			infowindow = new google.maps.InfoWindow({
+        		content: contentString
+        	});
+
+			var position = new google.maps.LatLng(0, 0);
+            var mapOptions = {
+              zoom: 17,
+              center: position
+            }
+            map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            get_basureros('{% url 'basurero-list' %}?format=json');
+        });
+
+        function get_basureros (url) {
+        	$.ajax({
+            	url:url,
+            	success: function(data){
+            		for (var i = data.results.length - 1; i >= 0; i--) {
+            			var basurero = data.results[i]
+            			var position = new google.maps.LatLng(basurero.gps.latitude, basurero.gps.longitude);
+            			var marker1 = new google.maps.Marker({
+			                position: position,
+			                map: map,
+			                title: basurero.nombre
+			            });
+            			console.log(basurero);
+            			bounds.extend(position);
+            			marker1.addListener('click', function() {
+				        	infowindow.open(map, marker1);
+				        });
+
+            		};
+            		if (data.next) {
+            			get_basureros(data.next);
+            		}else {
+            			map.fitBounds(bounds);
+            		}
+            	}
+            })
+        }
+	</script>
+	<style type="text/css">
+		body, #map{
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+	</style>
+</head>
+<body>
+	<div id="map"></div>
+</body>
+</html>
