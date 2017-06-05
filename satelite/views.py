@@ -104,7 +104,6 @@ def mostrar_basureros(request):
 	return render(request,"index.html")
 #end def
 
-@login_required
 def home(request):
 	return render(request,"home.html")
 #end def

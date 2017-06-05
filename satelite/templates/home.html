@@ -1,34 +1,20 @@
+{% load static %}
 <html>
 <head>
 	<title>Basureros satelites</title>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans+Condensed:700,300,300italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="{% static 'satelites/css/style.css' %}" />
 	<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD1tjEA-nc_qr9ta0sqmqVtQSJLkNxj8T0&sensor=SET_TO_TRUE_OR_FALSE"></script>
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="{% static 'satelites/js/jmpress.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'satelites/js/jquery.jmslideshow.js' %}"></script>
+    <script type="text/javascript" src="{% static 'satelites/js/modernizr.custom.48780.js' %}"></script>
 	<script type="text/javascript">
 		$("document").ready(function(){
-			var contentString = '<div id="content">'+
-            '<div id="siteNotice">'+
-            '</div>'+
-            '<h1 id="firstHeading" class="firstHeading">Uluru</h1>'+
-            '<div id="bodyContent">'+
-            '<p><b>Uluru</b>, also referred to as <b>Ayers Rock</b>, is a large ' +
-            'sandstone rock formation in the southern part of the '+
-            'Northern Territory, central Australia. It lies 335&#160;km (208&#160;mi) '+
-            'south west of the nearest large town, Alice Springs; 450&#160;km '+
-            '(280&#160;mi) by road. Kata Tjuta and Uluru are the two major '+
-            'features of the Uluru - Kata Tjuta National Park. Uluru is '+
-            'sacred to the Pitjantjatjara and Yankunytjatjara, the '+
-            'Aboriginal people of the area. It has many springs, waterholes, '+
-            'rock caves and ancient paintings. Uluru is listed as a World '+
-            'Heritage Site.</p>'+
-            '<p>Attribution: Uluru, <a href="https://en.wikipedia.org/w/index.php?title=Uluru&oldid=297882194">'+
-            'https://en.wikipedia.org/w/index.php?title=Uluru</a> '+
-            '(last visited June 22, 2009).</p>'+
-            '</div>'+
-            '</div>';
+            $( '#jms-slideshow' ).jmslideshow();
+
 			bounds = new google.maps.LatLngBounds();
-			infowindow = new google.maps.InfoWindow({
-        		content: contentString
-        	});
+            infowindow = new google.maps.InfoWindow();
 
 			var position = new google.maps.LatLng(0, 0);
             var mapOptions = {
@@ -38,6 +24,11 @@
             map = new google.maps.Map(document.getElementById('map'), mapOptions);
 
             get_basureros('{% url 'basurero-list' %}?format=json');
+
+            $('#jms-slideshow').jmslideshow();
+            $('#modal .modal-close').click(function (){
+                $('#modal').fadeOut();
+            });
         });
 
         function get_basureros (url) {
@@ -46,18 +37,7 @@
             	success: function(data){
             		for (var i = data.results.length - 1; i >= 0; i--) {
             			var basurero = data.results[i]
-            			var position = new google.maps.LatLng(basurero.gps.latitude, basurero.gps.longitude);
-            			var marker1 = new google.maps.Marker({
-			                position: position,
-			                map: map,
-			                title: basurero.nombre
-			            });
-            			console.log(basurero);
-            			bounds.extend(position);
-            			marker1.addListener('click', function() {
-				        	infowindow.open(map, marker1);
-				        });
-
+                        add_marker(basurero)
             		};
             		if (data.next) {
             			get_basureros(data.next);
@@ -65,7 +45,37 @@
             			map.fitBounds(bounds);
             		}
             	}
-            })
+            });
+        }
+
+        function add_marker(basurero){
+            var position = new google.maps.LatLng(basurero.gps.latitude, basurero.gps.longitude);
+            var marker = new google.maps.Marker({
+                position: position,
+                map: map,
+                title: basurero.nombre
+            });
+            marker.basurero = basurero;
+            bounds.extend(position);
+
+            marker.addListener('click', function() {
+                console.log(this);
+                var contentString = '<div id="content">'+
+                                    '<div id="siteNotice">'+
+                                    '</div>'+
+                                    '<h1 id="firstHeading" class="firstHeading">'+ this.title +'</h1>'+
+                                    '<div id="bodyContent">'+
+                                    '<p><b>Tamaño:</b> '+ this.basurero.tamano +'m<sup>3</sup><br><br> '+ this.basurero.descripcion +'</p>'+
+                                    '<p><a href="#" onclick="showModal()">'+
+                                    'Ver fotos'+
+                                    '</div>'+
+                                    '</div>';
+                infowindow.setContent(contentString);
+                infowindow.open(map, this);
+            });
+        }
+        function showModal(){
+            $('#modal').fadeIn();
         }
 	</script>
 	<style type="text/css">
@@ -75,9 +85,77 @@
 			margin: 0;
 			padding: 0;
 		}
+        #modal {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.33);
+        }
+
+        span.modal-close {
+            position: absolute;
+            top: 8px;
+            height: 30px;
+            width: 30px;
+            cursor: pointer;
+            z-index: 2000;
+            box-shadow: 1px 1px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            background: #fff;
+            right: 9%;
+            background-image: url(static/satelites/images/close.svg);
+            background-position: center;
+        }
 	</style>
 </head>
 <body>
 	<div id="map"></div>
+    <div id="modal">
+        <span class="modal-close"></span>
+        <section id="jms-slideshow" class="jms-slideshow">
+                <div class="step" data-color="color-1">
+                    <div class="jms-content">
+                        <h3>Just when I thought...</h3>
+                        <p>From fairest creatures we desire increase, that thereby beauty's rose might never die</p>
+                        <a class="jms-link" href="#">Read more</a>
+                    </div>
+                    <img src="{% static 'satelites/images/1.png' %}" />
+                </div>
+                <div class="step" data-color="color-2" data-y="500" data-scale="0.4" data-rotate-x="30">
+                    <div class="jms-content">
+                        <h3>Holy cannoli!</h3>
+                        <p>But as the riper should by time decease, his tender heir might bear his memory</p>
+                        <a class="jms-link" href="#">Read more</a>
+                    </div>
+                    <img src="{% static 'satelites/images/2.png' %}" />
+                </div>
+                <div class="step" data-color="color-3" data-x="2000" data-z="3000" data-rotate="170">
+                    <div class="jms-content">
+                        <h3>No time to waste</h3>
+                        <p>Within thine own bud buriest thy content and, tender churl, makest waste in niggarding</p>
+                        <a class="jms-link" href="#">Read more</a>
+                    </div>
+                    <img src="{% static 'satelites/images/3.png' %}" />
+                </div>
+                <div class="step" data-color="color-4" data-x="3000">
+                    <div class="jms-content">
+                        <h3>Supercool!</h3>
+                        <p>Making a famine where abundance lies, thyself thy foe, to thy sweet self too cruel</p>
+                        <a class="jms-link" href="#">Read more</a>
+                    </div>
+                    <img src="{% static 'satelites/images/4.png' %}" />
+                </div>
+                <div class="step" data-color="color-5" data-x="4500" data-z="1000" data-rotate-y="45">
+                    <div class="jms-content">
+                        <h3>Did you know that...</h3>
+                        <p>Thou that art now the world's fresh ornament and only herald to the gaudy spring</p>
+                        <a class="jms-link" href="#">Read more</a>
+                    </div>
+                    <img src="{% static 'satelites/images/5.png' %}" />
+                </div>
+        </section>
+    </div>
 </body>
 </html>

@@ -7,3 +7,4 @@ media/**/*.png
 log
 *.backup
 b_sat/*
+.DS_Store
