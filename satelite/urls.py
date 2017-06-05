@@ -8,4 +8,8 @@ urlpatterns = patterns('pedido.views',
 	url(r'^reportar/$', views.reportar_basurero, name='reportar_basurero'),
 	url(r'^descartar/$', views.descartar_reporte, name='descartar_reporte'),
 	url(r'^indexar/$', views.indexar_reporte, name='indexar_reporte'),
+	url(r'^indexar/$', views.indexar_reporte, name='indexar_reporte'),
+	url(r'^login/$', views.Login.as_view(), name="login"),
+	url(r'^logout/$', views.Logout.as_view(), name="logout"),
+
 )

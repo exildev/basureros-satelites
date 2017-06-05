@@ -1,10 +1,14 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.files import File
 from models import Imagen, Basurero, GPS, Reporte
 from forms import BasureroForm
 from django.views.decorators.csrf import csrf_exempt
 from django.db import connection
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, logout, authenticate
+from django.views.generic import TemplateView
+from supra import views as supra
 import string
 import os
 import json
@@ -95,6 +99,7 @@ def json_basureros(request):
 	return HttpResponse(status=400, content_type="application/json")
 #end def
 
+@login_required
 def mostrar_basureros(request):
 	return render(request,"index.html")
 #end def
@@ -108,3 +113,49 @@ def handle_uploaded_file(pk, f):
 		return '/tmp/'+filename, filename
 	#end 
 #end def
+
+class Login(supra.SupraSession):
+	template_name = "satelite/login.html"
+
+	def form_valid(self, form):
+		instance = form.save()
+		for inline in self.validated_inilines:
+			inline.instance = instance
+			inline.save()
+		# end for
+		nex = self.request.GET.get('next', False)
+		if nex:
+			return HttpResponseRedirect(nex)
+		return HttpResponseRedirect('/')
+	# end def
+
+	def login(self, request, cleaned_data):
+		user = authenticate(username=cleaned_data[
+							'username'], password=cleaned_data['password'])
+		if user is not None:
+			exist_obj = self.model.objects.filter(pk=user.pk).count()
+			if exist_obj and user.is_active:
+				login(request, user)
+				return user
+			# end if
+		# end if
+		return HttpResponseRedirect('/empleados/login/')
+		# end def
+
+	def form_invalid(self, form):
+		errors = dict(form.errors)
+		for i in self.invalided_inilines:
+			errors['inlines'] = list(i.errors)
+		# end for
+		return render(self.request, self.template_name, {"form": form})
+	# end def
+# end class
+
+
+class Logout(TemplateView):
+
+    def dispatch(self, request, *args, **kwargs):
+        logout(request, **kwargs)
+        return HttpResponseRedirect('/')
+    # end def
+# end class
