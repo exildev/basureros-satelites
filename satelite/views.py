@@ -103,12 +103,13 @@ def json_basureros(request):
 def json_basureros_markers(request):
 	basureros = Basurero.objects.annotate(num_reportes=Count('reporte')).filter(num_reportes__gt=0)
 	basureros_list = [{
+			"pk": basurero.pk,
 			"latitude": basurero.gps.latitude,
 			"longitude": basurero.gps.longitude,
 			"title": basurero.nombre,
 			"description": basurero.descripcion,
 			"image": "http://104.236.33.228:8080/" + basurero.imagenes().last().imagen.url,
-			"price": str(basurero.tamano) + "m3",
+			"price": str(basurero.tamano),
 			"details_url": "map-property.html",
 			"ribbon_mark_text": "Rent",
 			"ribbon_mark_class": "ribbon-primary",
@@ -116,6 +117,23 @@ def json_basureros_markers(request):
 			"icon": "building-02"
 		} for basurero in basureros]
 	return HttpResponse(json.dumps({'markers': basureros_list}), content_type="application/json")
+#end def
+
+def json_reportes_basureros(request):
+	basurero = request.GET.get('pk', False)
+	
+	if basurero:
+		imagenes = Imagen.objects.filter(reporte__basurero__pk=basurero)
+		imagenes_list = [{
+			'latitude':imagen.reporte.gps.latitude,
+			'longitude':imagen.reporte.gps.longitude,
+			'pk': imagen.reporte.pk,
+			'fecha': imagen.reporte.fecha.strftime('%m/%d/%Y'),
+			'imagen': "http://104.236.33.228:8080/" + imagen.imagen.url,
+		} for imagen in imagenes]
+		return HttpResponse(json.dumps(imagenes_list), content_type="application/json")
+	#end if
+	return HttpResponse(status=400, content_type="application/json")
 #end def
 
 @login_required

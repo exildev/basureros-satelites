@@ -257,7 +257,7 @@ function loadScript() {
     document.body.appendChild(script);
 }
 
-window.onload = loadScript;
+//window.onload = loadScript;
 
 function initScripts() {
     var $scripts = [

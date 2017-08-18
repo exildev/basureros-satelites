@@ -191,11 +191,12 @@ WARNING: Respond.js doesn't work if you view the page via file:// -->
 
     <!-- Sidebar component with st-effect-1 (set on the toggle button within the navbar) -->
     <aside class="sidebar right sidebar-size-xs-1 sidebar-size-lg-48pc sidebar-size-40pc sidebar-offset-0 sidebar-skin-white" id=sidebar-map data-toggle-layout=sidebar-r-48pc-lg,sidebar-r-40pc data-toggle-bar=true data-overlay=false>
-      <div data-scrollable>
+      <div>
 
         <h4 class="category">Archivos</h4>
+        <a href="#sidebar-map" id="close-sidebar" data-toggle="sidebar-menu"><i class="fa fa-close"></i></a>
         <div class="sidebar-block padding-none">
-          <div data-toggle="gridalicious" data-width="200">
+          <div data-toggle="gridalicious" data-width="200" sidebar-content>
             <div class="panel panel-default relative">
               <div class="ribbon-heading ribbon-primary inline absolute left margin-none">Sale</div>
               <div class="cover hover overlay margin-none">
@@ -416,30 +417,10 @@ WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!-- extra div for emulating position:fixed of the menu -->
         <div class="st-content-inner padding-top-none" id="content">
 
-          <div id="google-fs-realestate" data-toggle="google-maps" data-file="{% url 'json_basureros_markers' %}" data-zoom-position="LEFT_BOTTOM" class="maps-google-fs" center="10.406563,-75.5122578"></div>
+          <!--div id="google-fs-realestate" data-toggle="google-maps" data-file="{% url 'json_basureros_markers' %}" data-zoom-position="LEFT_BOTTOM" class="maps-google-fs" center="10.406563,-75.5122578"></div-->
 
-          <nav class="navbar navbar-default navbar-size-large navbar-static-top navbar-map-overlay">
-            <a data-toggle="sidebar-menu" href="#sidebar-map" class="toggle pull-right hidden-xs margin-none"><i class="fa fa-list"></i></a>
-            <div class="navbar-header">
-              <div class="container-fluid">
-                <div class="navbar-text pull-left"><i class="fa fa-fw fa-info"></i> Discover thousands of locations</div>
-                <a class="toggle pull-right margin-none visible-xs" data-toggle="collapse" data-target="#map-nav"><i class="fa fa-sliders fa-rotate-90"></i></a>
-              </div>
-            </div>
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="map-nav">
-              <form class="navbar-form  navbar-left">
-                <div class="search-2">
-                  <div class="input-group">
-                    <input type="text" class="form-control form-control-w-150" placeholder="Search ..">
-                    <span class="input-group-btn">
-            <button class="btn btn-inverse" type="button"><i class="fa fa-search"></i></button>
-        </span>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </nav>
+          <div class="maps-google-fs" id="real-map"></div>
+
           {% verbatim %}
           <script id="real-estate-map-pop-1" type="text/x-handlebars-template">
             <div class="padding-none full">
@@ -451,23 +432,11 @@ WARNING: Respond.js doesn't work if you view the page via file:// -->
               </div>
               <div class="list-group margin-none">
                 <div class="list-group-item">
-                  <a href="{{ details_url }}" class="btn btn-primary btn-circle pull-right">
-                    <i class="fa fa-shopping-cart"></i>
-                  </a>
                   <h4 class="margin-v-0-5">{{ title }}</h4>
-                  <p class="small">
-                    <span class="fa fa-fw fa-star text-yellow-800"></span>
-                    <span class="fa fa-fw fa-star text-yellow-800"></span>
-                    <span class="fa fa-fw fa-star text-yellow-800"></span>
-                    <span class="fa fa-fw fa-star-o text-yellow-800"></span>
-                    <span class="fa fa-fw fa-star-o text-yellow-800"></span>
-                  </p>
                   <p>{{ description }}</p>
-                  <label class="label label-grey-100">&euro;{{ price }}</label>&nbsp;
+                  <label class="label label-grey-100">{{ price }} m<sup>3</sup></label>&nbsp;
                   <small>
-
-                    <i class="fa fa-fw icon-home-fill-1"></i> Agency
-
+                    <a href="#sidebar-map" data-toggle="sidebar-menu" onclick="load_photos({{pk}})">Ver fotos</a>
                   </small>
                 </div>
               </div>
@@ -503,17 +472,25 @@ WARNING: Respond.js doesn't work if you view the page via file:// -->
             </div>
           </script>
 
-          <script id="real-estate-map-pop_icon" type="text/x-handlebars-template">
-            <div>
-              <div class="text-center">
-                <div class="h1 text-grey-300">
-                  <i class="{{ inner_icon }}"></i>
-                </div>
-                <p><a href="{{ details_url }}" class="h4 text-primary">{{ name }}</a></p>
-                <p>{{ location }}</p>
+          <script id="report_template" type="text/x-handlebars-template">
+            <div class="panel panel-default relative">
+              <div class="ribbon-heading ribbon-primary inline absolute left margin-none">Sale</div>
+              <div class="cover hover overlay margin-none">
+                <img src="{{ imagen }}" alt="location" class="img-responsive" />
+                <a href="property.html" class="overlay overlay-full overlay-bg-black overlay-hover">
+                  <span class="v-center">
+                <span class="btn btn-circle btn-white"><i class="fa fa-eye"></i></span>
+                  </span>
+                </a>
+              </div>
+              <div class="panel-body">
+                <h4 class="margin-v-0-5">{{ fecha }}</h4>
+                <p>{{latitude}}, {{longitude}}</p>
               </div>
             </div>
           </script>
+
+
           {% endverbatim %}
         </div>
         <!-- /st-content-inner -->
@@ -606,6 +583,115 @@ WARNING: Respond.js doesn't work if you view the page via file:// -->
         app.js already includes main.js so this should be loaded
         ONLY when using the standalone modules; -->
   <script src="{% static 'js/app/main.js' %}"></script>
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD1tjEA-nc_qr9ta0sqmqVtQSJLkNxj8T0&sensor=SET_TO_TRUE_OR_FALSE"></script>
+  <script type="text/javascript">
+    $(document).ready(function(){
+      var mapOptions = {
+        zoom: 13,
+        center: new google.maps.LatLng(10.3998334,-75.5066745)
+      }
+
+      container = document.getElementById('real-map')
+
+      map = new google.maps.Map(container, mapOptions);
+      infoWindow =  new google.maps.InfoWindow({
+        content: "hola mundo"
+      });
+
+      $.getJSON("{% url 'json_basureros_markers' %}", function (data) {
+          $.each(data.markers, function (i, marker) {
+              var o = typeof marker.options !== 'undefined' ? marker.options : {};
+              addMarker(i, marker, o, container, map);
+          });
+
+          google.maps.event.addListenerOnce(map, 'idle', function () {
+
+              library.resize(container, map, infoWindowData, options.center);
+
+              if (options.pagination) {
+                  container.gmap('pagination', 'title', mapData);
+              }
+
+          });
+      });
+    })
+
+    addMarker = function (i, marker, options, container, map) {
+          var iconBase = '/static/images/markers/';
+          var position = typeof marker.latLng !== 'undefined' ? marker.latLng : false;
+          if (! position && typeof marker.latitude !== 'undefined' && typeof marker.longitude !== 'undefined') position = new google.maps.LatLng(marker.latitude, marker.longitude);
+          if (! position) return false;
+
+          var markerOptions = {
+              "id": i,
+              "position": position,
+              "draggable": false,
+              "icon": iconBase + marker.icon + ".png",
+              "map": map
+          };
+
+          if (typeof options == 'object') markerOptions = $.extend({}, markerOptions, options);
+
+          var open = typeof marker.open !== 'undefined' && marker.open === true;
+
+          var markerInst = new google.maps.Marker(markerOptions);
+
+          markerInst.setTitle(marker.title);
+
+          google.maps.event.addListener(markerInst, 'click', function () {
+            infoWindow.setContent(infoWindowContent(marker));
+            infoWindow.open(map, markerInst);
+            load_photos(marker.pk);
+          });
+
+          var markerData = $.extend({}, marker, {
+              "id": i,
+              "latLng": new google.maps.LatLng(marker.latitude, marker.longitude)
+          });
+
+          markerInst.set('content', markerData);
+
+          if (open) infoWindowOpen(i, marker);
+
+          return markerInst;
+      };
+
+      infoWindowContent = function (marker) {
+          var source = $("#" + marker.template).html();
+          var template = Handlebars.compile(source);
+          return template(marker);
+      };
+
+      function load_photos(pk){
+        var sidebar = $("[sidebar-content]");
+        sidebar.html("");
+        console.log(sidebar);
+        $.getJSON("{% url 'json_reportes_basureros' %}?pk="+pk, function (data) {
+          $.each(data, function (i, reporte) {
+             console.log("load fotos", reporte);
+             var source = $("#report_template").html();
+             var template = Handlebars.compile(source);
+             sidebar.append(template(reporte));
+          });
+        });
+      }
+  </script>
+
+  <style type="text/css">
+    #close-sidebar{
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 15px;
+    }
+    [sidebar-content] .galcolumn{
+      display: none;
+    }
+
+    aside.sidebar.right {
+      overflow: auto;
+    }
+  </style>
 
 </body>
 
