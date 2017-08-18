@@ -2,7 +2,7 @@ import django_filters
 from django.shortcuts import render
 from rest_framework import routers, serializers, viewsets, filters, generics
 from satelite import models as satelite
-from django.db.models import Q
+from django.db.models import Q, Count
 # Create your views here.
 
 class ImagenSerializer(serializers.HyperlinkedModelSerializer):
@@ -49,7 +49,7 @@ class BasureroSerializer(serializers.HyperlinkedModelSerializer):
 #end class
 
 class BasureroViewSet(viewsets.ModelViewSet):
-	queryset = satelite.Basurero.objects.all()
+	queryset = satelite.Basurero.objects.annotate(num_reportes=Count('reporte')).filter(num_reportes__gt=0)
 	serializer_class = BasureroSerializer
 #end class
 

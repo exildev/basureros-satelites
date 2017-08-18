@@ -8,6 +8,7 @@ from django.db import connection
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from django.views.generic import TemplateView
+from django.db.models import Q, Count
 from supra import views as supra
 import string
 import os
@@ -97,6 +98,24 @@ def json_basureros(request):
 		return HttpResponse(json.dumps(basureros_list), content_type="application/json")
 	#end if
 	return HttpResponse(status=400, content_type="application/json")
+#end def
+
+def json_basureros_markers(request):
+	basureros = Basurero.objects.annotate(num_reportes=Count('reporte')).filter(num_reportes__gt=0)
+	basureros_list = [{
+			"latitude": basurero.gps.latitude,
+			"longitude": basurero.gps.longitude,
+			"title": basurero.nombre,
+			"description": basurero.descripcion,
+			"image": "http://104.236.33.228:8080/" + basurero.imagenes().last().imagen.url,
+			"price": str(basurero.tamano) + "m3",
+			"details_url": "map-property.html",
+			"ribbon_mark_text": "Rent",
+			"ribbon_mark_class": "ribbon-primary",
+			"template": "real-estate-map-pop-1",
+			"icon": "building-02"
+		} for basurero in basureros]
+	return HttpResponse(json.dumps({'markers': basureros_list}), content_type="application/json")
 #end def
 
 @login_required
