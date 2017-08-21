@@ -254,7 +254,7 @@ function loadScript() {
     script.type = 'text/javascript';
     script.src = 'https://maps.googleapis.com/maps/api/js?v=3.exp&' +
     'callback=initGoogleMaps';
-    document.body.appendChild(script);
+    //document.body.appendChild(script);
 }
 
 //window.onload = loadScript;

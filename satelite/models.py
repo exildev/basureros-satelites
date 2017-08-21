@@ -26,7 +26,7 @@ class GPS(models.Model):
 
 class Reporte(models.Model):
 	gps = models.OneToOneField('GPS')
-	fecha = models.DateTimeField(auto_now_add=True)
+	fecha = models.DateTimeField()
 	basurero = models.ForeignKey('Basurero', null = True, blank = True)
 	descartado = models.NullBooleanField(default=None)
 	class Meta:
@@ -35,7 +35,7 @@ class Reporte(models.Model):
 	#end class
 
 	def __unicode__(self):
-		return  "reporte " + unicode(self.pk)
+		return  "reporte " + unicode(self.pk) + ' ' + self.fecha.strftime('%d/%m/%Y')
 	#end def
 #end class
 

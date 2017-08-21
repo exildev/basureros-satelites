@@ -101,87 +101,21 @@ WARNING: Respond.js doesn't work if you view the page via file:// -->
 
         <!-- Collect the nav links, forms, and other content for toggling -->
         <div class="collapse navbar-collapse" id="main-nav">
-          <form class="navbar-form navbar-left margin-none ">
-            <div class="search-1">
-              <div class="input-group">
-                <span class="input-group-addon"><i class="icon-search"></i></span>
-                <input type="text" class="form-control form-control-w-150" placeholder="Search ..">
-              </div>
-            </div>
-          </form>
           <ul class="nav navbar-nav navbar-right ">
             <!-- Login -->
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <i class="fa fa-fw fa-lock"></i> Login
+            <li class="open" id="trashes">
+              <a href="#" onclick="getBasureros()">
+                <i class="fa fa-fw fa-trash"></i> Basureros
               </a>
-              <div class="dropdown-menu dropdown-size-280">
-                <form>
-                  <div class="form-group">
-                    <div class="input-group">
-                      <span class="input-group-addon"><i class="fa fa-user"></i></span>
-                      <input type="text" class="form-control" placeholder="Username">
-                    </div>
-                  </div>
-                  <div class="form-group">
-                    <div class="input-group">
-                      <span class="input-group-addon"><i class="fa fa-shield"></i></span>
-                      <input type="password" class="form-control" placeholder="Password">
-                    </div>
-                  </div>
-                  <div class="text-center">
-                    <button type="submit" class="btn btn-primary">Login <i class="fa fa-sign-in"></i></button>
-                  </div>
-                </form>
-              </div>
             </li>
             <!-- // END login -->
             <!-- Sign up -->
-            <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <i class="fa fa-fw fa-plus"></i> Sign Up
+            <li class="" id="reports">
+              <a href="#" onclick="getReportes()">
+                <i class="fa fa-fw fa-location-arrow "></i> Reportes
               </a>
-              <div class="dropdown-menu dropdown-size-280">
-                <form>
-                  <div class="row">
-                    <div class="col-md-6">
-                      <div class="form-group form-control-default">
-                        <label for="exampleInputFirstName">First name</label>
-                        <input type="email" class="form-control" id="exampleInputFirstName" placeholder="Your first name">
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                      <div class="form-group form-control-default">
-                        <label for="exampleInputLastName">Last name</label>
-                        <input type="email" class="form-control" id="exampleInputLastName" placeholder="Your last name">
-                      </div>
-                    </div>
-                  </div>
-                  <div class="form-group form-control-default required">
-                    <label for="exampleInputEmail1">Email address</label>
-                    <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Enter email">
-                  </div>
-                  <div class="form-group form-control-default required">
-                    <label for="exampleInputPassword1">Password</label>
-                    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
-                  </div>
-                  <button type="submit" class="btn btn-primary">Submit</button>
-                </form>
-              </div>
             </li>
             <!-- // END sign up -->
-            <!-- user -->
-            <li class="dropdown user">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                <img src="{% static 'images/people/110/guy-6.jpg' %}" alt="" class="img-circle" /> Bill<span class="caret"></span>
-              </a>
-              <ul class="dropdown-menu" role="menu">
-                <li><a href="#"><i class="fa fa-user"></i>Profile</a></li>
-                <li><a href="#"><i class="fa fa-wrench"></i>Settings</a></li>
-                <li><a href="#"><i class="fa fa-sign-out"></i>Logout</a></li>
-              </ul>
-            </li>
-            <!-- // END user -->
           </ul>
         </div>
         <!-- /.navbar-collapse -->
@@ -420,13 +354,18 @@ WARNING: Respond.js doesn't work if you view the page via file:// -->
           <!--div id="google-fs-realestate" data-toggle="google-maps" data-file="{% url 'json_basureros_markers' %}" data-zoom-position="LEFT_BOTTOM" class="maps-google-fs" center="10.406563,-75.5122578"></div-->
 
           <div class="maps-google-fs" id="real-map"></div>
+          <div id="load-main">
+            <svg class="spinner" width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+               <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+            </svg>
+          </div>
 
           {% verbatim %}
           <script id="real-estate-map-pop-1" type="text/x-handlebars-template">
             <div class="padding-none full">
-              <div class="ribbon-heading text-h5 {{ ribbon_mark_class }} absolute leftinline margin-none">{{ ribbon_mark_text }}</div>
+              <div class="ribbon-heading text-h5 {{ ribbon_mark_class }} absolute leftinline margin-none">Basurero</div>
               <div class="cover overlay cover-image-full margin-none">
-                <a href="{{ details_url }}" class="thumb" data-height="150px">
+                <a class="thumb" data-height="150px">
                   <img src="{{ image }}" alt="image" class="img-responsive">
                 </a>
               </div>
@@ -474,14 +413,9 @@ WARNING: Respond.js doesn't work if you view the page via file:// -->
 
           <script id="report_template" type="text/x-handlebars-template">
             <div class="panel panel-default relative">
-              <div class="ribbon-heading ribbon-primary inline absolute left margin-none">Sale</div>
+              <div class="ribbon-heading ribbon-primary inline absolute left margin-none">Rerporte</div>
               <div class="cover hover overlay margin-none">
                 <img src="{{ imagen }}" alt="location" class="img-responsive" />
-                <a href="property.html" class="overlay overlay-full overlay-bg-black overlay-hover">
-                  <span class="v-center">
-                <span class="btn btn-circle btn-white"><i class="fa fa-eye"></i></span>
-                  </span>
-                </a>
               </div>
               <div class="panel-body">
                 <h4 class="margin-v-0-5">{{ fecha }}</h4>
@@ -583,7 +517,7 @@ WARNING: Respond.js doesn't work if you view the page via file:// -->
         app.js already includes main.js so this should be loaded
         ONLY when using the standalone modules; -->
   <script src="{% static 'js/app/main.js' %}"></script>
-  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD1tjEA-nc_qr9ta0sqmqVtQSJLkNxj8T0&sensor=SET_TO_TRUE_OR_FALSE"></script>
+  <script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyD1tjEA-nc_qr9ta0sqmqVtQSJLkNxj8T0&libraries=visualization"></script>
   <script type="text/javascript">
     $(document).ready(function(){
       var mapOptions = {
@@ -598,23 +532,228 @@ WARNING: Respond.js doesn't work if you view the page via file:// -->
         content: "hola mundo"
       });
 
+      markers = []
+      heatmap = null;
+      heatpoints = [];
+      getBasureros();
+
+ var styledMapType = new google.maps.StyledMapType(
+      [
+  {
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#f5f5f5"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.icon",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#616161"
+      }
+    ]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      {
+        "color": "#f5f5f5"
+      }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#bdbdbd"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#eeeeee"
+      }
+    ]
+  },
+  {
+    "featureType": "poi",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#757575"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#e5e5e5"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#9e9e9e"
+      }
+    ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#ffffff"
+      }
+    ]
+  },
+  {
+    "featureType": "road.arterial",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#757575"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#dadada"
+      }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#616161"
+      }
+    ]
+  },
+  {
+    "featureType": "road.local",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#9e9e9e"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.line",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#e5e5e5"
+      }
+    ]
+  },
+  {
+    "featureType": "transit.station",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#eeeeee"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#c9c9c9"
+      }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#9e9e9e"
+      }
+    ]
+  }
+]);
+        map.mapTypes.set('styled_map', styledMapType);
+        map.setMapTypeId('styled_map');
+    })
+
+    function getBasureros(){
+      $("#load-main").show();
+      $("#trashes").addClass("open");
+      $("#reports").removeClass("open");
+      clearMap();
+      markers = [];
       $.getJSON("{% url 'json_basureros_markers' %}", function (data) {
           $.each(data.markers, function (i, marker) {
               var o = typeof marker.options !== 'undefined' ? marker.options : {};
               addMarker(i, marker, o, container, map);
           });
-
-          google.maps.event.addListenerOnce(map, 'idle', function () {
-
-              library.resize(container, map, infoWindowData, options.center);
-
-              if (options.pagination) {
-                  container.gmap('pagination', 'title', mapData);
-              }
-
-          });
+          $("#load-main").hide();
       });
-    })
+    }
+
+    function clearMap(){
+      $.each(markers, function(i, marker){
+        marker.setMap(null);
+      });
+      markers = [];
+
+      if (heatmap) {
+        heatmap.setMap(null);
+        heatmap = null;
+      }
+    }
+
+    function getReportes(url){
+      $("#load-main").show();
+      if (url == undefined || url == null) {
+        url = "{% url 'reporte-list' %}?format=json";
+        clearMap();
+        $("#reports").addClass("open");
+        $("#trashes").removeClass("open");
+      };
+      console.log(url);
+      $.getJSON(url, function (data) {
+          $.each(data.results, function (i, marker) {
+              heatpoints.push(new google.maps.LatLng(marker.gps.latitude, marker.gps.longitude))
+              console.log(marker);
+          });
+          if (data.next) {
+            getReportes(data.next);
+          }else{
+            heatmap = new google.maps.visualization.HeatmapLayer({
+              data: heatpoints,
+              map: map
+            });
+            $("#load-main").hide();
+          }
+      });
+    }
 
     addMarker = function (i, marker, options, container, map) {
           var iconBase = '/static/images/markers/';
@@ -635,13 +774,14 @@ WARNING: Respond.js doesn't work if you view the page via file:// -->
           var open = typeof marker.open !== 'undefined' && marker.open === true;
 
           var markerInst = new google.maps.Marker(markerOptions);
+          markers.push(markerInst);
 
           markerInst.setTitle(marker.title);
 
           google.maps.event.addListener(markerInst, 'click', function () {
             infoWindow.setContent(infoWindowContent(marker));
             infoWindow.open(map, markerInst);
-            load_photos(marker.pk);
+            map.setCenter(position);
           });
 
           var markerData = $.extend({}, marker, {
@@ -690,6 +830,60 @@ WARNING: Respond.js doesn't work if you view the page via file:// -->
 
     aside.sidebar.right {
       overflow: auto;
+    }
+
+    #load-main {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.65);
+      z-index: 99999;
+    }
+
+// Here is where the magic happens
+
+
+    .spinner {
+      animation: rotator 1.4s linear infinite;
+    }
+
+    @keyframes rotator {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(270deg); }
+    }
+
+    .path {
+      stroke-dasharray: 187;
+      stroke-dashoffset: 0;
+      transform-origin: center;
+      animation:
+        dash 1.4s ease-in-out infinite, 
+        colors 5.6s ease-in-out infinite;
+    }
+
+    @keyframes colors {
+      0% { stroke: #4285F4; }
+      25% { stroke: #DE3E35; }
+      50% { stroke: #F7C223; }
+      75% { stroke: #1B9A59; }
+      100% { stroke: #4285F4; }
+    }
+
+    @keyframes dash {
+     0% { stroke-dashoffset: 187; }
+     50% {
+       stroke-dashoffset: 46.75;
+       transform:rotate(135deg);
+     }
+     100% {
+       stroke-dashoffset: 187;
+       transform:rotate(450deg);
+     }
     }
   </style>
 

@@ -69,9 +69,15 @@ class ReporteViewSet(viewsets.ModelViewSet):
 	serializer_class = ReporteSerializer
 #end class
 
+class HeatViewSet(viewsets.ModelViewSet):
+	queryset = satelite.Reporte.objects.filter(~Q(gps__latitude="NaN") & ~Q(gps__longitude="NaN") & ~Q(gps__latitude="undefined") & ~Q(gps__longitude="undefined") & ~Q(gps__latitude=None) & ~Q(gps__longitude=None))
+	serializer_class = ReporteSerializer
+#end class
+
 
 router = routers.DefaultRouter()
 #router.register(r'imagen', ImagenViewSet)
 router.register(r'gps', GPSViewSet)
 router.register(r'reporte', ReporteViewSet)
+router.register(r'reporteheat', HeatViewSet)
 router.register(r'basurero', BasureroViewSet)
