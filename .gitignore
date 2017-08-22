@@ -1,7 +1,6 @@
 *.pyc
 media/**/*.jpg
 media/**/*.png
-*.txt
 *.sql
 *.sqlite3
 log
