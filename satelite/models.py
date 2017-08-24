@@ -29,7 +29,7 @@ class GPS(models.Model):
 
 class Reporte(models.Model):
 	gps = models.OneToOneField('GPS')
-	fecha = models.DateTimeField()
+	fecha = models.DateTimeField(auto_now_add=True)
 	basurero = models.ForeignKey('Basurero', null = True, blank = True)
 	descartado = models.NullBooleanField(default=None)
 	class Meta:

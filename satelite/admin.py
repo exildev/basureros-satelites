@@ -10,4 +10,9 @@ admin.site.unregister(Group)
 #admin.site.register(Imagen)
 #admin.site.register(Basurero)
 #admin.site.register(GPS)
-#admin.site.register(Reporte)
+
+#class ReporteAdmin(admin.ModelAdmin):
+#	fields=['gps', 'fecha', 'basurero', 'descartado']
+#end class
+
+#admin.site.register(Reporte, ReporteAdmin)
