@@ -730,7 +730,7 @@ WARNING: Respond.js doesn't work if you view the page via file:// -->
     function getReportes(url){
       $("#load-main").show();
       if (url == undefined || url == null) {
-        url = "{% url 'reporte-list' %}?format=json";
+        url = "/rest/reporteheat/?format=json";
         clearMap();
         $("#reports").addClass("open");
         $("#trashes").removeClass("open");

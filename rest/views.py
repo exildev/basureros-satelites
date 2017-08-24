@@ -78,6 +78,6 @@ class HeatViewSet(viewsets.ModelViewSet):
 router = routers.DefaultRouter()
 #router.register(r'imagen', ImagenViewSet)
 router.register(r'gps', GPSViewSet)
-router.register(r'reporte', ReporteViewSet)
 router.register(r'reporteheat', HeatViewSet)
+router.register(r'reporte', ReporteViewSet)
 router.register(r'basurero', BasureroViewSet)
