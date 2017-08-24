@@ -9,6 +9,9 @@ class Imagen(models.Model):
 		verbose_name_plural = "Imágenes"
 	#end class
 	
+	def __unicode__(self):
+		return unicode(self.reporte)
+	#end def
 #end class
 
 class GPS(models.Model):
