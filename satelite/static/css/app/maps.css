@@ -39,7 +39,11 @@
   font-size: 14px;
 }
 .gm-style .img-responsive {
-  max-width: 150px !important;
+  max-width: 180px !important;
+}
+
+#real-map p {
+  max-width: 150px;
 }
 .infoBox {
   background-color: #fff;
