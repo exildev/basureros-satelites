@@ -180,7 +180,7 @@ class Login(supra.SupraSession):
 				return user
 			# end if
 		# end if
-		return HttpResponseRedirect('/empleados/login/')
+		return HttpResponseRedirect('/basureros/login/')
 		# end def
 
 	def form_invalid(self, form):
@@ -197,6 +197,6 @@ class Logout(TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         logout(request, **kwargs)
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect('/basureros/clasificar/')
     # end def
 # end class

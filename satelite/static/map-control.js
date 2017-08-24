@@ -25,6 +25,9 @@ Polymer({
             value: null
         },
     },
+    logout: function () {
+        window.location.replace("/basureros/logout/");
+    },
     created: function () {
         this.async(function () {
             this._init();
