@@ -45,6 +45,7 @@ def descartar_reporte(request):
 	reporte = request.GET.get('id', False)
 	reporte = get_object_or_404(Reporte, pk=reporte)
 	reporte.descartado = True
+	reporte.clasificador = request.user
 	reporte.save()
 	return HttpResponse(status=200)
 #end def
@@ -59,6 +60,7 @@ def crear_basurero(request):
 		basurero.gps = reporte.gps
 		basurero.save()
 		reporte.basurero = basurero
+		reporte.clasificador = request.user
 		reporte.save()
 		return HttpResponse(status=200)
 	#end if
@@ -76,6 +78,7 @@ def indexar_reporte(request):
 		basurero = f.save(commit=False)
 		basurero.save()
 		reporte.basurero = basurero
+		reporte.clasificador = request.user
 		reporte.save()
 		return HttpResponse(status=200)
 	#end if

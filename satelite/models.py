@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 from django.db import models
+from django.contrib.auth.models import User
 
 class Imagen(models.Model):
 	imagen = models.FileField(upload_to="media")
@@ -32,6 +33,7 @@ class Reporte(models.Model):
 	fecha = models.DateTimeField(auto_now_add=True)
 	basurero = models.ForeignKey('Basurero', null = True, blank = True)
 	descartado = models.NullBooleanField(default=None)
+	clasificador = models.ForeignKey(User, null=True, blank=True)
 	class Meta:
 		verbose_name = "Reporte"
 		verbose_name_plural = "Reportes"
