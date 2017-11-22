@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'server_camera.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'camera',
+        'NAME': 'satelites',
         'USER': 'postgres',
-        'PASSWORD': 'Exile*74522547',
-        'HOST': '104.236.33.228',
+        'PASSWORD': '123456',
+        'HOST': '/opt/bitnami/postgresql',
         'POST': '5432'
     },
     
